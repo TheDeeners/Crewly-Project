@@ -1,0 +1,601 @@
+openapi: 3.0.3
+info:
+  title: Crewly HRM API
+  description: API documentation for Crewly Human Resource Management System (Attendance & Leave System).
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Invalid credentials
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@crewly.test
+        password:
+          type: string
+          example: Admin1234!
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserProfile'
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeCode:
+          type: string
+          example: EMP001
+        email:
+          type: string
+          example: admin@crewly.test
+        firstName:
+          type: string
+          example: Admin
+        lastName:
+          type: string
+          example: HR
+        role:
+          type: string
+          enum: [ADMIN, MANAGER, EMPLOYEE]
+        managerId:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    AttendanceRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        workDate:
+          type: string
+          example: '2026-11-19'
+        checkInAt:
+          type: string
+          format: date-time
+        checkOutAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    LeaveType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: ลาพักร้อน
+        defaultQuotaDays:
+          type: integer
+          example: 10
+        isPaid:
+          type: boolean
+          example: true
+
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        leaveTypeId:
+          type: string
+          format: uuid
+        year:
+          type: integer
+          example: 2026
+        quotaDays:
+          type: integer
+          example: 10
+        usedDays:
+          type: integer
+          example: 0
+        leaveType:
+          $ref: '#/components/schemas/LeaveType'
+
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        leaveTypeId:
+          type: string
+          format: uuid
+        startDate:
+          type: string
+          example: '2026-11-20'
+        endDate:
+          type: string
+          example: '2026-11-21'
+        totalDays:
+          type: integer
+          example: 2
+        reason:
+          type: string
+          example: ธุระส่วนตัว
+        status:
+          type: string
+          enum: [PENDING, APPROVED, REJECTED, CANCELLED]
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateLeaveRequest:
+      type: object
+      required:
+        - leaveTypeId
+        - startDate
+        - endDate
+        - reason
+      properties:
+        leaveTypeId:
+          type: string
+          format: uuid
+        startDate:
+          type: string
+          example: '2026-12-01'
+        endDate:
+          type: string
+          example: '2026-12-02'
+        reason:
+          type: string
+          example: ลาพักร้อนประจำปี
+
+    Holiday:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        holidayDate:
+          type: string
+          example: '2026-01-01'
+        name:
+          type: string
+          example: วันปีใหม่
+
+    CreateHolidayRequest:
+      type: object
+      required:
+        - holidayDate
+        - name
+      properties:
+        holidayDate:
+          type: string
+          example: '2026-05-01'
+        name:
+          type: string
+          example: วันแรงงานแห่งชาติ
+
+paths:
+  /auth/login:
+    post:
+      summary: เข้าสู่ระบบ (Login)
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        200:
+          description: เข้าสู่ระบบสำเร็จ ได้รับ JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        401:
+          description: อีเมลหรือรหัสผ่านไม่ถูกต้อง หรือผู้ใช้ถูกระงับ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/me:
+    get:
+      summary: ดึงข้อมูลโปรไฟล์ผู้ใช้ปัจจุบัน
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: ข้อมูลผู้ใช้ปัจจุบัน
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+
+  /users:
+    get:
+      summary: ดึงรายชื่อผู้ใช้ทั้งหมด (Admin)
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: รายชื่อผู้ใช้ทั้งหมด
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserProfile'
+    post:
+      summary: สร้างผู้ใช้ใหม่ และกำหนดโควตาลาปีปัจจุบันให้อัตโนมัติ (Admin)
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [employeeCode, email, password, firstName, lastName, role]
+              properties:
+                employeeCode: { type: string, example: EMP005 }
+                email: { type: string, example: newuser@crewly.test }
+                password: { type: string, example: User1234! }
+                firstName: { type: string, example: Somsak }
+                lastName: { type: string, example: Dee }
+                role: { type: string, enum: [ADMIN, MANAGER, EMPLOYEE] }
+                managerId: { type: string, nullable: true }
+      responses:
+        201:
+          description: สร้างผู้ใช้สำเร็จ
+        409:
+          description: อีเมลหรือรหัสพนักงานซ้ำ
+
+  /users/{id}:
+    patch:
+      summary: แก้ไขข้อมูลผู้ใช้ (Admin)
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName: { type: string }
+                lastName: { type: string }
+                role: { type: string, enum: [ADMIN, MANAGER, EMPLOYEE] }
+                managerId: { type: string, nullable: true }
+                isActive: { type: boolean }
+                password: { type: string }
+      responses:
+        200:
+          description: แก้ไขสำเร็จ
+
+  /attendance/check-in:
+    post:
+      summary: บันทึกเวลาเช็คอิน (วันละ 1 ครั้ง)
+      tags: [Attendance]
+      security:
+        - bearerAuth: []
+      responses:
+        201:
+          description: เช็คอินสำเร็จ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceRecord'
+        400:
+          description: เช็คอินในวันนี้ไปแล้ว
+
+  /attendance/check-out:
+    post:
+      summary: บันทึกเวลาเช็คเอาต์
+      tags: [Attendance]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: เช็คเอาต์สำเร็จ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceRecord'
+        400:
+          description: ยังไม่ได้เช็คอินวันนี้ หรือเช็คเอาต์ไปแล้ว
+
+  /attendance/today:
+    get:
+      summary: ดูสถานะการเข้างานของวันนี้
+      tags: [Attendance]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: ข้อมูลการเข้างานวันนี้
+
+  /attendance/me:
+    get:
+      summary: ดูประวัติการเข้างานของตัวเอง (กรองตามวันที่ได้)
+      tags: [Attendance]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema: { type: string }
+          example: '2026-11-01'
+        - name: endDate
+          in: query
+          schema: { type: string }
+          example: '2026-11-30'
+      responses:
+        200:
+          description: รายการประวัติเข้างาน
+
+  /attendance/team:
+    get:
+      summary: ดูประวัติการเข้างานของทีมงาน (Manager / Admin)
+      tags: [Attendance]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema: { type: string }
+        - name: endDate
+          in: query
+          schema: { type: string }
+      responses:
+        200:
+          description: รายการประวัติเข้างานของทีมงาน
+
+  /leave-types:
+    get:
+      summary: ดึงรายการประเภทการลาทั้งหมด
+      tags: [LeaveTypes]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: รายการประเภทการลา
+    post:
+      summary: เพิ่มประเภทการลาใหม่ (Admin)
+      tags: [LeaveTypes]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, defaultQuotaDays, isPaid]
+              properties:
+                name: { type: string, example: ลาอุปสมบท }
+                defaultQuotaDays: { type: integer, example: 15 }
+                isPaid: { type: boolean, example: true }
+      responses:
+        201:
+          description: สร้างสำเร็จ
+
+  /leave-types/{id}:
+    patch:
+      summary: แก้ไขประเภทการลา (Admin)
+      tags: [LeaveTypes]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                defaultQuotaDays: { type: integer }
+                isPaid: { type: boolean }
+      responses:
+        200:
+          description: แก้ไขสำเร็จ
+
+  /leave-balances/me:
+    get:
+      summary: ดูโควตาการลาและจำนวนที่ใช้ไปของตัวเองในปีปัจจุบัน
+      tags: [LeaveBalances]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: โควตาการลาคงเหลือ
+
+  /leave-requests:
+    post:
+      summary: ยื่นคำขอลาใหม่
+      tags: [LeaveRequests]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeaveRequest'
+      responses:
+        201:
+          description: ยื่นคำขอลาสำเร็จ สถานะเป็น PENDING
+        400:
+          description: วันที่ลาไม่ถูกต้อง, ไม่มีวันทำงาน, หรือโควตาไม่พอ
+        409:
+          description: วันลาซ้อนทับกับใบลาอื่น
+
+  /leave-requests/me:
+    get:
+      summary: ดูรายการคำขอลาของตนเอง
+      tags: [LeaveRequests]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: รายการใบลาของตนเอง
+
+  /leave-requests/{id}/cancel:
+    patch:
+      summary: ยกเลิกคำขอลาของตนเอง (เฉพาะสถานะ PENDING)
+      tags: [LeaveRequests]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: ยกเลิกสำเร็จ สถานะเปลี่ยนเป็น CANCELLED
+        400:
+          description: ไม่อยู่ในสถานะ PENDING
+        403:
+          description: ไม่ใช่ใบลาของตนเอง
+
+  /leave-requests/pending:
+    get:
+      summary: ดูรายการคำขอลาที่รออนุมัติ (Manager ดูลูกทีม, Admin ดูทุกคน)
+      tags: [LeaveRequests]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: รายการใบลาที่รออนุมัติ
+
+  /leave-requests/{id}/approve:
+    patch:
+      summary: อนุมัติคำขอลา (หักโควตาวันลาอัตโนมัติ)
+      tags: [LeaveRequests]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: อนุมัติสำเร็จ
+        400:
+          description: ใบลาไม่อยู่ในสถานะ PENDING
+        403:
+          description: ห้ามอนุมัติใบลาตนเอง หรือไม่มีสิทธิ์อนุมัติ
+
+  /leave-requests/{id}/reject:
+    patch:
+      summary: ปฏิเสธคำขอลา (ไม่หักโควตา)
+      tags: [LeaveRequests]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: ปฏิเสธสำเร็จ
+        403:
+          description: ห้ามปฏิเสธใบลาตนเอง หรือไม่มีสิทธิ์
+
+  /holidays:
+    get:
+      summary: ดูรายการวันหยุดบริษัททั้งหมด
+      tags: [Holidays]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: รายการวันหยุด
+    post:
+      summary: เพิ่มวันหยุดใหม่ (Admin)
+      tags: [Holidays]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHolidayRequest'
+      responses:
+        201:
+          description: เพิ่มวันหยุดสำเร็จ
+        409:
+          description: วันหยุดซ้ำ
+
+  /holidays/{id}:
+    delete:
+      summary: ลบวันหยุด (Admin)
+      tags: [Holidays]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: ลบวันหยุดสำเร็จ

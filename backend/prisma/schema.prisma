@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  EMPLOYEE
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  employeeCode String   @unique
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         Role     @default(EMPLOYEE)
+  // self-relation: managerId points to the User who is this person's manager
+  managerId    String?
+  manager      User?    @relation("ManagerSubordinates", fields: [managerId], references: [id])
+  subordinates User[]   @relation("ManagerSubordinates")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  attendances    Attendance[]
+  leaveBalances  LeaveBalance[]
+  // leave requests filed by this user
+  leaveRequests  LeaveRequest[] @relation("Requester")
+  // leave requests this user approved/rejected
+  approvedLeaves LeaveRequest[] @relation("Approver")
+}
+
+model Attendance {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  // workDate stored as "YYYY-MM-DD" string in Bangkok timezone
+  workDate    String
+  checkInAt   DateTime
+  checkOutAt  DateTime?
+
+  @@unique([userId, workDate])
+  @@index([userId, workDate])
+}
+
+model LeaveType {
+  id               String         @id @default(uuid())
+  name             String         @unique
+  defaultQuotaDays Int
+  isPaid           Boolean
+
+  leaveBalances  LeaveBalance[]
+  leaveRequests  LeaveRequest[]
+}
+
+model LeaveBalance {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  leaveTypeId String
+  leaveType   LeaveType @relation(fields: [leaveTypeId], references: [id])
+  year        Int
+  quotaDays   Int
+  usedDays    Int       @default(0)
+
+  @@unique([userId, leaveTypeId, year])
+}
+
+model LeaveRequest {
+  id          String      @id @default(uuid())
+  // userId = the person filing the leave
+  userId      String
+  user        User        @relation("Requester", fields: [userId], references: [id])
+  leaveTypeId String
+  leaveType   LeaveType   @relation(fields: [leaveTypeId], references: [id])
+  // approverId = the manager or admin who approved/rejected
+  approverId  String?
+  approver    User?       @relation("Approver", fields: [approverId], references: [id])
+  // dates stored as "YYYY-MM-DD" strings
+  startDate   String
+  endDate     String
+  totalDays   Int
+  reason      String
+  status      LeaveStatus @default(PENDING)
+  decidedAt   DateTime?
+  createdAt   DateTime    @default(now())
+
+  @@index([status, userId])
+}
+
+model Holiday {
+  id          String @id @default(uuid())
+  // holidayDate stored as "YYYY-MM-DD" string
+  holidayDate String @unique
+  name        String
+}
