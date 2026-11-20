@@ -4,6 +4,8 @@ import { api } from '../lib/api'
 import { AttendanceRecord } from '../types'
 import { Table } from '../components/Table'
 import { Button } from '../components/Button'
+import { Badge } from '../components/Badge'
+import { IconClock, IconFilter, IconCalendar } from '../components/Icons'
 
 export function AttendancePage() {
   const { user } = useAuth()
@@ -80,7 +82,6 @@ export function AttendancePage() {
   function handleResetFilter() {
     setStartDate('')
     setEndDate('')
-    // รีเซ็ตแล้วโหลดใหม่
     if (activeTab === 'me') {
       api.get<AttendanceRecord[]>('/attendance/me').then(setMyRecords)
     } else {
@@ -98,37 +99,40 @@ export function AttendancePage() {
   const myColumns = [
     {
       header: 'วันที่ปฏิบัติงาน',
-      render: (r: AttendanceRecord) => <span className="font-medium text-gray-800">{r.workDate}</span>,
-    },
-    {
-      header: 'เวลาเช็คอิน',
       render: (r: AttendanceRecord) => (
-        <span className="text-green-600 font-semibold">{formatDateTime(r.checkInAt)} น.</span>
+        <div className="flex items-center gap-2">
+          <IconCalendar className="w-4 h-4 text-primary shrink-0" />
+          <span className="font-semibold text-txt">{r.workDate}</span>
+        </div>
       ),
     },
     {
-      header: 'เวลาเช็คเอาต์',
+      header: 'เวลาเข้างาน (Check-in)',
       render: (r: AttendanceRecord) => (
+        <span className="text-status-success font-semibold tracking-wide">
+          {formatDateTime(r.checkInAt)} น.
+        </span>
+      ),
+    },
+    {
+      header: 'เวลาออกงาน (Check-out)',
+      render: (r: AttendanceRecord) =>
         r.checkOutAt ? (
-          <span className="text-blue-600 font-semibold">{formatDateTime(r.checkOutAt)} น.</span>
+          <span className="text-status-info font-semibold tracking-wide">
+            {formatDateTime(r.checkOutAt)} น.
+          </span>
         ) : (
-          <span className="text-gray-400 italic">ยังไม่เช็คเอาต์</span>
-        )
-      ),
+          <span className="text-txt-light italic text-xs">ยังไม่เช็คเอาต์</span>
+        ),
     },
     {
       header: 'สถานะ',
-      render: (r: AttendanceRecord) => (
+      render: (r: AttendanceRecord) =>
         r.checkOutAt ? (
-          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-            สมบูรณ์
-          </span>
+          <Badge variant="success">บันทึกเวลาครบถ้วน</Badge>
         ) : (
-          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-            กำลังปฏิบัติงาน
-          </span>
-        )
-      ),
+          <Badge variant="pending">กำลังปฏิบัติงาน</Badge>
+        ),
     },
   ]
 
@@ -137,151 +141,160 @@ export function AttendancePage() {
     {
       header: 'พนักงาน',
       render: (r: AttendanceRecord) => (
-        <div>
-          <div className="font-semibold text-gray-800">
-            {r.user?.firstName} {r.user?.lastName}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0">
+            {r.user?.firstName?.[0] || 'U'}
           </div>
-          <div className="text-xs text-gray-500 font-mono">
-            {r.user?.employeeCode} • {r.user?.role}
+          <div>
+            <div className="font-semibold text-txt text-sm">
+              {r.user?.firstName} {r.user?.lastName}
+            </div>
+            <div className="text-[11px] text-txt-muted">
+              {r.user?.employeeCode} • {r.user?.role}
+            </div>
           </div>
         </div>
       ),
     },
     {
       header: 'วันที่',
-      render: (r: AttendanceRecord) => <span className="font-medium">{r.workDate}</span>,
+      render: (r: AttendanceRecord) => <span className="font-medium text-txt">{r.workDate}</span>,
     },
     {
       header: 'เวลาเช็คอิน',
       render: (r: AttendanceRecord) => (
-        <span className="text-green-600 font-semibold">{formatDateTime(r.checkInAt)} น.</span>
+        <span className="text-status-success font-semibold">
+          {formatDateTime(r.checkInAt)} น.
+        </span>
       ),
     },
     {
       header: 'เวลาเช็คเอาต์',
-      render: (r: AttendanceRecord) => (
+      render: (r: AttendanceRecord) =>
         r.checkOutAt ? (
-          <span className="text-blue-600 font-semibold">{formatDateTime(r.checkOutAt)} น.</span>
+          <span className="text-status-info font-semibold">
+            {formatDateTime(r.checkOutAt)} น.
+          </span>
         ) : (
-          <span className="text-gray-400 italic">ยังไม่เช็คเอาต์</span>
-        )
-      ),
+          <span className="text-txt-light italic text-xs">ยังไม่เช็คเอาต์</span>
+        ),
     },
     {
       header: 'สถานะ',
-      render: (r: AttendanceRecord) => (
+      render: (r: AttendanceRecord) =>
         r.checkOutAt ? (
-          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-            สมบูรณ์
-          </span>
+          <Badge variant="success">ครบถ้วน</Badge>
         ) : (
-          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-            กำลังปฏิบัติงาน
-          </span>
-        )
-      ),
+          <Badge variant="pending">กำลังปฏิบัติงาน</Badge>
+        ),
     },
   ]
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
+      {/* Header & Tabs */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">ประวัติการเข้างาน</h1>
-          <p className="text-sm text-gray-500 mt-1">ดูประวัติการเช็คอินและเช็คเอาต์ย้อนหลัง</p>
+          <h1 className="text-2xl font-bold text-txt">ประวัติการเข้างาน</h1>
+          <p className="text-sm text-txt-muted mt-0.5">
+            ตรวจสอบข้อมูลเวลาเข้า-ออกงานและการปฏิบัติงาน
+          </p>
         </div>
 
-        {/* แท็บสลับดูของตัวเอง หรือดูของทีม (ถ้ามีสิทธิ์) */}
+        {/* แท็บสลับดูของตัวเอง หรือดูของทีม */}
         {isManagerOrAdmin && (
-          <div className="flex bg-gray-100 p-1 rounded-lg">
+          <div className="flex bg-surface p-1 rounded-2xl border border-border shadow-subtle">
             <button
               onClick={() => setActiveTab('me')}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
                 activeTab === 'me'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-txt-muted hover:text-txt'
               }`}
             >
-              ของฉัน
+              ประวัติของฉัน
             </button>
             <button
               onClick={() => setActiveTab('team')}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
                 activeTab === 'team'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-txt-muted hover:text-txt'
               }`}
             >
-              ของทีมงาน {user?.role === 'ADMIN' ? '(ทุกคน)' : '(ลูกทีม)'}
+              ประวัติทีมงาน {user?.role === 'ADMIN' ? '(ทุกคน)' : '(ลูกทีม)'}
             </button>
           </div>
         )}
       </div>
 
-      {/* ฟอร์มกรองวันที่ */}
+      {error && (
+        <div className="p-4 bg-[#FEF2F2] text-[#B91C1C] rounded-2xl text-sm border border-[#FECACA]">
+          {error}
+        </div>
+      )}
+
+      {/* Filter Card */}
       <form
         onSubmit={handleFilterSubmit}
-        className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-wrap items-end gap-4"
+        className="bg-surface p-5 rounded-2xl border border-border shadow-card flex flex-wrap items-end gap-4"
       >
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-gray-600">ตั้งแต่วันที่</label>
+        <div className="flex flex-col gap-1.5 flex-1 min-w-[160px]">
+          <label className="text-xs font-semibold text-txt">ตั้งแต่วันที่</label>
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-surface border border-border rounded-xl px-3.5 py-2 text-sm text-txt focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-gray-600">ถึงวันที่</label>
+        <div className="flex flex-col gap-1.5 flex-1 min-w-[160px]">
+          <label className="text-xs font-semibold text-txt">ถึงวันที่</label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-surface border border-border rounded-xl px-3.5 py-2 text-sm text-txt focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           />
         </div>
 
         <div className="flex gap-2">
-          <Button type="submit" variant="primary" isLoading={isLoading} className="py-2">
+          <Button
+            type="submit"
+            variant="primary"
+            isLoading={isLoading}
+            leftIcon={<IconFilter className="w-4 h-4" />}
+          >
             ค้นหา
           </Button>
           {(startDate || endDate) && (
-            <Button type="button" variant="secondary" onClick={handleResetFilter} className="py-2">
+            <Button type="button" variant="outline" onClick={handleResetFilter}>
               ล้างตัวกรอง
             </Button>
           )}
         </div>
       </form>
 
-      {/* ข้อความ Error */}
-      {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm border border-red-200">
-          {error}
-        </div>
-      )}
-
-      {/* ตารางแสดงข้อมูล */}
-      {isLoading ? (
-        <div className="bg-white p-8 rounded-lg border border-gray-200 text-center text-gray-500">
-          กำลังโหลดประวัติ...
-        </div>
-      ) : activeTab === 'me' ? (
-        <Table
-          columns={myColumns}
-          data={myRecords}
-          keyExtractor={(item) => item.id}
-          emptyMessage="ไม่พบประวัติการเข้างานของคุณ"
-        />
-      ) : (
-        <Table
-          columns={teamColumns}
-          data={teamRecords}
-          keyExtractor={(item) => item.id}
-          emptyMessage="ไม่พบประวัติการเข้างานของทีมงาน"
-        />
-      )}
+      {/* Table Section */}
+      <div className="space-y-3">
+        {isLoading ? (
+          <div className="bg-surface p-12 rounded-2xl border border-border text-center text-txt-muted text-sm shadow-subtle">
+            กำลังโหลดข้อมูลบันทึกเวลา...
+          </div>
+        ) : (
+          <Table
+            columns={activeTab === 'me' ? myColumns : teamColumns}
+            data={activeTab === 'me' ? myRecords : teamRecords}
+            keyExtractor={(item) => item.id}
+            emptyMessage={
+              activeTab === 'me'
+                ? 'ยังไม่มีประวัติการเข้างานของคุณในช่วงเวลานี้'
+                : 'ไม่พบประวัติการเข้างานของทีมงานในช่วงเวลานี้'
+            }
+          />
+        )}
+      </div>
     </div>
   )
 }

@@ -3,6 +3,8 @@ import { api } from '../lib/api'
 import { LeaveRequest } from '../types'
 import { Table } from '../components/Table'
 import { Button } from '../components/Button'
+import { Badge } from '../components/Badge'
+import { IconCheck, IconX, IconCheckSquare } from '../components/Icons'
 
 export function ApprovalsPage() {
   const [pendingRequests, setPendingRequests] = useState<LeaveRequest[]>([])
@@ -37,7 +39,7 @@ export function ApprovalsPage() {
     setMessage(null)
     try {
       await api.patch(`/leave-requests/${id}/approve`, {})
-      setMessage({ text: 'อนุมัติคำขอลาเรียบร้อยแล้ว และระบบได้หักโควตาแล้ว', type: 'success' })
+      setMessage({ text: 'อนุมัติคำขอลาเรียบร้อยแล้ว ระบบได้ตัดโควตาวันลาแล้ว', type: 'success' })
       loadPendingRequests()
     } catch (err: any) {
       setMessage({ text: err.message || 'ไม่สามารถอนุมัติคำขอลาได้', type: 'error' })
@@ -69,12 +71,17 @@ export function ApprovalsPage() {
     {
       header: 'ผู้ยื่นคำขอ',
       render: (r: LeaveRequest) => (
-        <div>
-          <div className="font-semibold text-gray-800">
-            {r.user?.firstName} {r.user?.lastName}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0">
+            {r.user?.firstName?.[0] || 'U'}
           </div>
-          <div className="text-xs text-gray-500 font-mono">
-            {r.user?.employeeCode} • {r.user?.role}
+          <div>
+            <div className="font-semibold text-txt">
+              {r.user?.firstName} {r.user?.lastName}
+            </div>
+            <div className="text-xs text-txt-muted">
+              {r.user?.employeeCode} • {r.user?.role}
+            </div>
           </div>
         </div>
       ),
@@ -82,22 +89,22 @@ export function ApprovalsPage() {
     {
       header: 'ประเภทการลา',
       render: (r: LeaveRequest) => (
-        <span className="font-medium text-gray-800">{r.leaveType?.name}</span>
+        <span className="font-semibold text-txt">{r.leaveType?.name}</span>
       ),
     },
     {
       header: 'ช่วงวันที่ลา',
       render: (r: LeaveRequest) => (
         <div>
-          <span className="font-medium">{r.startDate} ถึง {r.endDate}</span>
-          <span className="text-xs text-blue-600 font-semibold block">({r.totalDays} วันทำงาน)</span>
+          <span className="font-medium text-txt">{r.startDate} ถึง {r.endDate}</span>
+          <span className="text-xs text-primary font-semibold block">({r.totalDays} วันทำงาน)</span>
         </div>
       ),
     },
     {
       header: 'เหตุผล',
       render: (r: LeaveRequest) => (
-        <span className="text-gray-600 text-xs max-w-xs block">{r.reason}</span>
+        <span className="text-txt-muted text-xs max-w-xs block line-clamp-2">{r.reason}</span>
       ),
     },
     {
@@ -105,7 +112,7 @@ export function ApprovalsPage() {
       render: (r: LeaveRequest) => {
         const d = new Date(r.createdAt)
         return (
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-txt-light">
             {d.toLocaleDateString('th-TH')} {d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
           </span>
         )
@@ -114,21 +121,23 @@ export function ApprovalsPage() {
     {
       header: 'การตัดสินใจ',
       render: (r: LeaveRequest) => (
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button
-            variant="primary"
+            variant="success"
+            size="sm"
             onClick={() => handleApprove(r.id)}
             disabled={actionLoadingId === r.id}
             isLoading={actionLoadingId === r.id}
-            className="text-xs py-1 px-3 bg-emerald-600 hover:bg-emerald-700"
+            leftIcon={<IconCheck className="w-3.5 h-3.5" />}
           >
             อนุมัติ
           </Button>
           <Button
             variant="danger"
+            size="sm"
             onClick={() => handleReject(r.id)}
             disabled={actionLoadingId === r.id}
-            className="text-xs py-1 px-3"
+            leftIcon={<IconX className="w-3.5 h-3.5" />}
           >
             ปฏิเสธ
           </Button>
@@ -138,20 +147,27 @@ export function ApprovalsPage() {
   ]
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">พิจารณาอนุมัติใบลา</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          ตรวจสอบและอนุมัติหรือปฏิเสธคำขอลาของทีมงาน
-        </p>
+    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-txt">พิจารณาอนุมัติใบลา</h1>
+            {pendingRequests.length > 0 && (
+              <Badge variant="pending">{pendingRequests.length} รายการรอพิจารณา</Badge>
+            )}
+          </div>
+          <p className="text-sm text-txt-muted mt-0.5">
+            ตรวจสอบและพิจารณาอนุมัติหรือปฏิเสธคำขอลาของทีมงาน
+          </p>
+        </div>
       </div>
 
       {message && (
         <div
-          className={`p-4 rounded-lg text-sm font-medium ${
+          className={`p-4 rounded-2xl text-sm font-medium border shadow-subtle ${
             message.type === 'success'
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
+              ? 'bg-[#F0FDF4] text-[#15803D] border-[#BBF7D0]'
+              : 'bg-[#FEF2F2] text-[#B91C1C] border-[#FECACA]'
           }`}
         >
           {message.text}
@@ -159,7 +175,7 @@ export function ApprovalsPage() {
       )}
 
       {isLoading ? (
-        <div className="bg-white p-8 rounded-lg border border-gray-200 text-center text-gray-500">
+        <div className="bg-surface p-12 rounded-3xl border border-border text-center text-txt-muted text-sm shadow-subtle">
           กำลังโหลดรายการรออนุมัติ...
         </div>
       ) : (

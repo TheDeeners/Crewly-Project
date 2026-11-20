@@ -4,6 +4,7 @@ import { Holiday } from '../types'
 import { Table } from '../components/Table'
 import { Button } from '../components/Button'
 import { Input } from '../components/Input'
+import { IconPlus, IconCalendar, IconX } from '../components/Icons'
 
 export function AdminHolidaysPage() {
   const [holidays, setHolidays] = useState<Holiday[]>([])
@@ -73,20 +74,25 @@ export function AdminHolidaysPage() {
   const columns = [
     {
       header: 'วันที่',
-      render: (h: Holiday) => <span className="font-mono font-medium text-gray-800">{h.holidayDate}</span>,
+      render: (h: Holiday) => (
+        <div className="flex items-center gap-2">
+          <IconCalendar className="w-4 h-4 text-primary shrink-0" />
+          <span className="font-mono font-semibold text-txt">{h.holidayDate}</span>
+        </div>
+      ),
     },
     {
       header: 'ชื่อวันหยุด',
-      render: (h: Holiday) => <span className="font-semibold text-gray-800">{h.name}</span>,
+      render: (h: Holiday) => <span className="font-semibold text-txt">{h.name}</span>,
     },
     {
       header: 'จัดการ',
       render: (h: Holiday) => (
         <Button
           variant="danger"
+          size="sm"
           onClick={() => handleDelete(h)}
           isLoading={deletingId === h.id}
-          className="text-xs py-1 px-3"
         >
           ลบ
         </Button>
@@ -95,23 +101,29 @@ export function AdminHolidaysPage() {
   ]
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">จัดการวันหยุดบริษัท</h1>
-          <p className="text-sm text-gray-500 mt-1">กำหนดวันหยุดตามประเพณีของบริษัท (จะไม่ถูกนับเป็นวันลา)</p>
+          <h1 className="text-2xl font-bold text-txt">จัดการวันหยุดบริษัท</h1>
+          <p className="text-sm text-txt-muted mt-0.5">
+            กำหนดวันหยุดตามประเพณีของบริษัท (ซึ่งระบบจะไม่นับเป็นวันลาของพนักงาน)
+          </p>
         </div>
-        <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-          + เพิ่มวันหยุด
+        <Button
+          variant="primary"
+          onClick={() => setShowCreateModal(true)}
+          leftIcon={<IconPlus className="w-4 h-4" />}
+        >
+          เพิ่มวันหยุด
         </Button>
       </div>
 
       {message && (
         <div
-          className={`p-4 rounded-lg text-sm font-medium ${
+          className={`p-4 rounded-2xl text-sm font-medium border shadow-subtle ${
             message.type === 'success'
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
+              ? 'bg-[#F0FDF4] text-[#15803D] border-[#BBF7D0]'
+              : 'bg-[#FEF2F2] text-[#B91C1C] border-[#FECACA]'
           }`}
         >
           {message.text}
@@ -119,8 +131,8 @@ export function AdminHolidaysPage() {
       )}
 
       {isLoading ? (
-        <div className="bg-white p-8 rounded-lg border border-gray-200 text-center text-gray-500">
-          กำลังโหลด...
+        <div className="bg-surface p-12 rounded-3xl border border-border text-center text-txt-muted text-sm shadow-subtle">
+          กำลังโหลดวันหยุด...
         </div>
       ) : (
         <Table
@@ -133,17 +145,30 @@ export function AdminHolidaysPage() {
 
       {/* Modal เพิ่มวันหยุดใหม่ */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <h2 className="text-lg font-bold text-gray-800">เพิ่มวันหยุดบริษัท</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-txt/40 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowCreateModal(false)}
+          />
+          <div className="relative bg-surface rounded-3xl border border-border shadow-float max-w-md w-full p-6 sm:p-7 space-y-5 z-10">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <h2 className="text-lg font-bold text-txt">เพิ่มวันหยุดบริษัท</h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="text-txt-muted hover:text-txt p-1 rounded-lg"
+              >
+                <IconX className="w-5 h-5" />
+              </button>
+            </div>
+
             <form onSubmit={handleCreateSubmit} className="space-y-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-gray-700">วันที่</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-txt">วันที่</label>
                 <input
                   type="date"
                   value={createForm.holidayDate}
                   onChange={(e) => setCreateForm({ ...createForm, holidayDate: e.target.value })}
-                  className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="bg-surface border border-border rounded-xl px-3.5 py-2 text-sm text-txt focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   required
                 />
               </div>
@@ -152,12 +177,12 @@ export function AdminHolidaysPage() {
                 label="ชื่อวันหยุด"
                 value={createForm.name}
                 onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                placeholder="เช่น วันสงกรานต์"
+                placeholder="เช่น วันสงกรานต์, วันขึ้นปีใหม่"
                 required
               />
 
-              <div className="pt-2 flex justify-end gap-2">
-                <Button type="button" variant="secondary" onClick={() => setShowCreateModal(false)}>
+              <div className="pt-3 border-t border-border flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setShowCreateModal(false)}>
                   ยกเลิก
                 </Button>
                 <Button type="submit" variant="primary" isLoading={isCreating}>

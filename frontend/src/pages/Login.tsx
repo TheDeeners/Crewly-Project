@@ -23,46 +23,83 @@ export function LoginPage() {
       await login(email, password)
       navigate('/dashboard')
     } catch (err) {
-      // Show error from backend (e.g. "Invalid email or password")
-      setError(err instanceof Error ? err.message : 'เข้าสู่ระบบไม่สำเร็จ')
+      setError(err instanceof Error ? err.message : 'เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-lg shadow p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-blue-600 mb-1">Crewly HRM</h1>
-        <p className="text-gray-500 text-sm mb-6">เข้าสู่ระบบเพื่อใช้งาน</p>
+    <div className="min-h-screen bg-bg flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Decorative background blurs in Burgundy and Cream */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-secondary/10 blur-3xl pointer-events-none" />
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Input
-            label="อีเมล"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@company.com"
-            required
-          />
-          <Input
-            label="รหัสผ่าน"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-          />
+      <div className="relative w-full max-w-md">
+        {/* Main Card */}
+        <div className="bg-surface rounded-3xl border border-border shadow-float p-8 sm:p-10">
+          {/* Logo & Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary text-white font-extrabold text-2xl items-center justify-center shadow-md mb-4">
+              C
+            </div>
+            <h1 className="text-2xl font-bold text-primary tracking-tight">Crewly HRM</h1>
+            <p className="text-txt-muted text-sm mt-1.5">
+              ระบบบริหารจัดการบุคลากรและการเข้างาน
+            </p>
+          </div>
 
-          {/* Show backend error message */}
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded">{error}</p>
-          )}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <Input
+              label="อีเมล (Email)"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@company.com"
+              autoComplete="email"
+              required
+            />
 
-          <Button type="submit" isLoading={isLoading} className="mt-2">
-            เข้าสู่ระบบ
-          </Button>
-        </form>
+            <Input
+              label="รหัสผ่าน (Password)"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              autoComplete="current-password"
+              required
+            />
+
+            {/* Error Message Alert */}
+            {error && (
+              <div className="p-3.5 rounded-xl text-xs font-medium bg-[#FEF2F2] text-[#B91C1C] border border-[#FECACA] flex items-start gap-2">
+                <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                  <line x1="12" y1="8" x2="12" y2="12" strokeWidth="2" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="2" />
+                </svg>
+                <span>{error}</span>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              isLoading={isLoading}
+              className="w-full mt-2"
+            >
+              เข้าสู่ระบบ
+            </Button>
+          </form>
+
+          {/* Footer note */}
+          <div className="mt-8 pt-6 border-t border-border text-center">
+            <p className="text-xs text-txt-light">
+              © {new Date().getFullYear()} Crewly HRM. สงวนลิขสิทธิ์
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )

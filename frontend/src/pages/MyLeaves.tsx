@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../lib/api'
 import { LeaveRequest, LeaveBalance } from '../types'
 import { Table } from '../components/Table'
 import { Button } from '../components/Button'
+import { Badge } from '../components/Badge'
+import { IconCalendar, IconPlus } from '../components/Icons'
 
 export function MyLeavesPage() {
   const navigate = useNavigate()
@@ -46,7 +48,6 @@ export function MyLeavesPage() {
     try {
       await api.patch(`/leave-requests/${id}/cancel`, {})
       setMessage({ text: 'ยกเลิกคำขอลาเรียบร้อยแล้ว', type: 'success' })
-      // รีโหลดข้อมูลใหม่
       loadData()
     } catch (err: any) {
       setMessage({ text: err.message || 'ไม่สามารถยกเลิกคำขอลาได้', type: 'error' })
@@ -55,35 +56,19 @@ export function MyLeavesPage() {
     }
   }
 
-  // แปลงสถานะเป็น badge สีสวยงาม
+  // แปลงสถานะเป็น badge สีของระบบที่ผู้ใช้กำหนด
   function renderStatusBadge(status: string) {
     switch (status) {
       case 'PENDING':
-        return (
-          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-            รออนุมัติ
-          </span>
-        )
+        return <Badge variant="pending">รออนุมัติ</Badge>
       case 'APPROVED':
-        return (
-          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-            อนุมัติแล้ว
-          </span>
-        )
+        return <Badge variant="success">อนุมัติแล้ว</Badge>
       case 'REJECTED':
-        return (
-          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-            ปฏิเสธ
-          </span>
-        )
+        return <Badge variant="rejected">ปฏิเสธ</Badge>
       case 'CANCELLED':
-        return (
-          <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
-            ยกเลิกแล้ว
-          </span>
-        )
+        return <Badge variant="neutral">ยกเลิกแล้ว</Badge>
       default:
-        return <span>{status}</span>
+        return <Badge variant="neutral">{status}</Badge>
     }
   }
 
@@ -91,22 +76,22 @@ export function MyLeavesPage() {
     {
       header: 'ประเภทการลา',
       render: (r: LeaveRequest) => (
-        <span className="font-semibold text-gray-800">{r.leaveType?.name || 'การลา'}</span>
+        <span className="font-semibold text-txt">{r.leaveType?.name || 'การลา'}</span>
       ),
     },
     {
       header: 'ช่วงวันที่ลา',
       render: (r: LeaveRequest) => (
         <div>
-          <span className="font-medium text-gray-700">{r.startDate} ถึง {r.endDate}</span>
-          <span className="text-xs text-gray-500 block">({r.totalDays} วันทำงาน)</span>
+          <span className="font-medium text-txt">{r.startDate} ถึง {r.endDate}</span>
+          <span className="text-xs text-primary font-semibold block">({r.totalDays} วันทำงาน)</span>
         </div>
       ),
     },
     {
       header: 'เหตุผล',
       render: (r: LeaveRequest) => (
-        <span className="text-gray-600 text-xs line-clamp-2 max-w-xs">{r.reason}</span>
+        <span className="text-txt-muted text-xs line-clamp-2 max-w-xs">{r.reason}</span>
       ),
     },
     {
@@ -115,54 +100,57 @@ export function MyLeavesPage() {
     },
     {
       header: 'ผู้อนุมัติ',
-      render: (r: LeaveRequest) => (
+      render: (r: LeaveRequest) =>
         r.approver ? (
-          <span className="text-xs text-gray-600">
+          <span className="text-xs text-txt font-medium">
             {r.approver.firstName} {r.approver.lastName}
           </span>
         ) : (
-          <span className="text-xs text-gray-400">-</span>
-        )
-      ),
+          <span className="text-xs text-txt-light">-</span>
+        ),
     },
     {
       header: 'การจัดการ',
-      render: (r: LeaveRequest) => (
+      render: (r: LeaveRequest) =>
         r.status === 'PENDING' ? (
           <Button
             variant="danger"
+            size="sm"
             onClick={() => handleCancel(r.id)}
             isLoading={actionLoadingId === r.id}
-            className="text-xs py-1 px-2.5"
           >
             ยกเลิก
           </Button>
         ) : (
-          <span className="text-xs text-gray-400">-</span>
-        )
-      ),
+          <span className="text-xs text-txt-light">-</span>
+        ),
     },
   ]
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">ใบลาของฉัน</h1>
-          <p className="text-sm text-gray-500 mt-1">ตรวจสอบโควตาและติดตามสถานะคำขอลา</p>
+          <h1 className="text-2xl font-bold text-txt">ใบลาของฉัน</h1>
+          <p className="text-sm text-txt-muted mt-0.5">
+            ตรวจสอบโควตาวันลาคงเหลือ และติดตามสถานะคำขอลา
+          </p>
         </div>
 
-        <Button variant="primary" onClick={() => navigate('/leave-form')}>
-          + ยื่นคำขอลาใหม่
-        </Button>
+        <Link to="/leave-form">
+          <Button variant="primary" leftIcon={<IconPlus className="w-4 h-4" />}>
+            ยื่นคำขอลาใหม่
+          </Button>
+        </Link>
       </div>
 
       {message && (
         <div
-          className={`p-4 rounded-lg text-sm font-medium ${
+          className={`p-4 rounded-2xl text-sm font-medium border shadow-subtle ${
             message.type === 'success'
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
+              ? 'bg-[#F0FDF4] text-[#15803D] border-[#BBF7D0]'
+              : 'bg-[#FEF2F2] text-[#B91C1C] border-[#FECACA]'
           }`}
         >
           {message.text}
@@ -170,27 +158,45 @@ export function MyLeavesPage() {
       )}
 
       {/* สรุปโควตาคงเหลือ */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {balances.map((b) => {
           const remaining = b.quotaDays - b.usedDays
+          const usagePercent = Math.min(100, Math.round((b.usedDays / b.quotaDays) * 100))
+
           return (
-            <div key={b.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-              <span className="text-xs font-semibold uppercase text-gray-400">{b.leaveType.name}</span>
-              <div className="mt-1 flex items-baseline justify-between">
-                <span className="text-2xl font-bold text-blue-600">{remaining}</span>
-                <span className="text-xs text-gray-500">คงเหลือ / {b.quotaDays} วัน</span>
+            <div
+              key={b.id}
+              className="bg-surface p-5 rounded-2xl border border-border shadow-card hover:shadow-cardHover transition-all duration-150"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-txt-muted">
+                  {b.leaveType.name}
+                </span>
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-bg text-txt-muted">
+                  สิทธิ์ {b.quotaDays} วัน
+                </span>
               </div>
-              <span className="text-xs text-gray-400 mt-1 block">ใช้ไป {b.usedDays} วัน</span>
+              <div className="mt-2.5 flex items-baseline justify-between">
+                <span className="text-3xl font-extrabold text-primary">{remaining}</span>
+                <span className="text-xs text-txt-muted font-medium">วันคงเหลือ</span>
+              </div>
+              <div className="w-full bg-[#E8DDD9] h-1.5 rounded-full mt-3 overflow-hidden">
+                <div
+                  className="bg-primary h-1.5 rounded-full transition-all"
+                  style={{ width: `${usagePercent}%` }}
+                />
+              </div>
+              <span className="text-xs text-txt-light mt-2 block">ใช้ไปแล้ว {b.usedDays} วัน</span>
             </div>
           )
         })}
       </div>
 
-      {/* รายการคำขอลา */}
+      {/* ประวัติคำขอลา */}
       <div className="space-y-3">
-        <h2 className="text-lg font-bold text-gray-800">ประวัติการขอลา</h2>
+        <h2 className="text-base font-bold text-txt">ประวัติการยื่นคำขอลา</h2>
         {isLoading ? (
-          <div className="bg-white p-8 rounded-lg border border-gray-200 text-center text-gray-500">
+          <div className="bg-surface p-12 rounded-2xl border border-border text-center text-txt-muted text-sm shadow-subtle">
             กำลังโหลดรายการ...
           </div>
         ) : (
@@ -198,7 +204,7 @@ export function MyLeavesPage() {
             columns={columns}
             data={requests}
             keyExtractor={(item) => item.id}
-            emptyMessage="ยังไม่มีประวัติการยื่นใบลา"
+            emptyMessage="ยังไม่มีประวัติการยื่นใบลาของคุณ"
           />
         )}
       </div>

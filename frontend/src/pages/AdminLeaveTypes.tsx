@@ -4,6 +4,8 @@ import { LeaveType } from '../types'
 import { Table } from '../components/Table'
 import { Button } from '../components/Button'
 import { Input } from '../components/Input'
+import { Badge } from '../components/Badge'
+import { IconPlus, IconX } from '../components/Icons'
 
 export function AdminLeaveTypesPage() {
   const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([])
@@ -91,32 +93,31 @@ export function AdminLeaveTypesPage() {
   const columns = [
     {
       header: 'ชื่อประเภทการลา',
-      render: (lt: LeaveType) => <span className="font-semibold text-gray-800">{lt.name}</span>,
+      render: (lt: LeaveType) => <span className="font-semibold text-txt">{lt.name}</span>,
     },
     {
-      header: 'โควตาเริ่มต้นต่อปี (วัน)',
+      header: 'โควตาเริ่มต้นต่อปี',
       render: (lt: LeaveType) => (
-        <span className="font-mono font-medium text-blue-600">{lt.defaultQuotaDays} วัน</span>
+        <span className="font-mono font-bold text-primary">{lt.defaultQuotaDays} วัน</span>
       ),
     },
     {
-      header: 'การจ่ายค่าจ้าง',
-      render: (lt: LeaveType) => (
+      header: 'เงื่อนไขค่าจ้าง',
+      render: (lt: LeaveType) =>
         lt.isPaid ? (
-          <span className="text-xs px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 font-semibold">
-            ได้รับค่าจ้าง
-          </span>
+          <Badge variant="success">ได้รับค่าจ้าง (Paid)</Badge>
         ) : (
-          <span className="text-xs px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 font-semibold">
-            ไม่ได้รับค่าจ้าง
-          </span>
-        )
-      ),
+          <Badge variant="neutral">ไม่ได้รับค่าจ้าง (Unpaid)</Badge>
+        ),
     },
     {
       header: 'จัดการ',
       render: (lt: LeaveType) => (
-        <Button variant="secondary" onClick={() => openEditModal(lt)} className="text-xs py-1 px-3">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => openEditModal(lt)}
+        >
           แก้ไข
         </Button>
       ),
@@ -124,23 +125,29 @@ export function AdminLeaveTypesPage() {
   ]
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">จัดการประเภทการลา</h1>
-          <p className="text-sm text-gray-500 mt-1">กำหนดประเภทการลา โควตาวันลาต่อปี และเงื่อนไขค่าจ้าง</p>
+          <h1 className="text-2xl font-bold text-txt">จัดการประเภทการลา</h1>
+          <p className="text-sm text-txt-muted mt-0.5">
+            กำหนดประเภทการลา โควตาวันลาเริ่มต้นต่อปี และเงื่อนไขค่าจ้าง
+          </p>
         </div>
-        <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-          + เพิ่มประเภทการลา
+        <Button
+          variant="primary"
+          onClick={() => setShowCreateModal(true)}
+          leftIcon={<IconPlus className="w-4 h-4" />}
+        >
+          เพิ่มประเภทการลา
         </Button>
       </div>
 
       {message && (
         <div
-          className={`p-4 rounded-lg text-sm font-medium ${
+          className={`p-4 rounded-2xl text-sm font-medium border shadow-subtle ${
             message.type === 'success'
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
+              ? 'bg-[#F0FDF4] text-[#15803D] border-[#BBF7D0]'
+              : 'bg-[#FEF2F2] text-[#B91C1C] border-[#FECACA]'
           }`}
         >
           {message.text}
@@ -148,8 +155,8 @@ export function AdminLeaveTypesPage() {
       )}
 
       {isLoading ? (
-        <div className="bg-white p-8 rounded-lg border border-gray-200 text-center text-gray-500">
-          กำลังโหลด...
+        <div className="bg-surface p-12 rounded-3xl border border-border text-center text-txt-muted text-sm shadow-subtle">
+          กำลังโหลดประเภทการลา...
         </div>
       ) : (
         <Table
@@ -162,15 +169,28 @@ export function AdminLeaveTypesPage() {
 
       {/* Modal สร้างใหม่ */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <h2 className="text-lg font-bold text-gray-800">เพิ่มประเภทการลาใหม่</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-txt/40 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowCreateModal(false)}
+          />
+          <div className="relative bg-surface rounded-3xl border border-border shadow-float max-w-md w-full p-6 sm:p-7 space-y-5 z-10">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <h2 className="text-lg font-bold text-txt">เพิ่มประเภทการลาใหม่</h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="text-txt-muted hover:text-txt p-1 rounded-lg"
+              >
+                <IconX className="w-5 h-5" />
+              </button>
+            </div>
+
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <Input
                 label="ชื่อประเภทการลา"
                 value={createForm.name}
                 onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                placeholder="เช่น ลาคลอดบุตร"
+                placeholder="เช่น ลาคลอดบุตร, ลาบวช"
                 required
               />
               <Input
@@ -178,28 +198,33 @@ export function AdminLeaveTypesPage() {
                 type="number"
                 min={1}
                 value={createForm.defaultQuotaDays}
-                onChange={(e) => setCreateForm({ ...createForm, defaultQuotaDays: parseInt(e.target.value, 10) || 1 })}
+                onChange={(e) =>
+                  setCreateForm({
+                    ...createForm,
+                    defaultQuotaDays: parseInt(e.target.value, 10) || 1,
+                  })
+                }
                 required
               />
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 pt-1">
                 <input
                   type="checkbox"
                   id="createIsPaid"
                   checked={createForm.isPaid}
                   onChange={(e) => setCreateForm({ ...createForm, isPaid: e.target.checked })}
-                  className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
+                  className="rounded text-primary focus:ring-primary w-4 h-4 cursor-pointer"
                 />
-                <label htmlFor="createIsPaid" className="text-sm font-medium text-gray-700">
+                <label htmlFor="createIsPaid" className="text-sm font-medium text-txt cursor-pointer">
                   จ่ายค่าจ้างตามปกติ (Paid Leave)
                 </label>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
-                <Button type="button" variant="secondary" onClick={() => setShowCreateModal(false)}>
+              <div className="pt-3 border-t border-border flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setShowCreateModal(false)}>
                   ยกเลิก
                 </Button>
                 <Button type="submit" variant="primary" isLoading={isCreating}>
-                  บันทึก
+                  บันทึกประเภทการลา
                 </Button>
               </div>
             </form>
@@ -209,9 +234,22 @@ export function AdminLeaveTypesPage() {
 
       {/* Modal แก้ไข */}
       {editingType && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <h2 className="text-lg font-bold text-gray-800">แก้ไข: {editingType.name}</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-txt/40 backdrop-blur-sm transition-opacity"
+            onClick={() => setEditingType(null)}
+          />
+          <div className="relative bg-surface rounded-3xl border border-border shadow-float max-w-md w-full p-6 sm:p-7 space-y-5 z-10">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <h2 className="text-lg font-bold text-txt">แก้ไข: {editingType.name}</h2>
+              <button
+                onClick={() => setEditingType(null)}
+                className="text-txt-muted hover:text-txt p-1 rounded-lg"
+              >
+                <IconX className="w-5 h-5" />
+              </button>
+            </div>
+
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <Input
                 label="ชื่อประเภทการลา"
@@ -224,24 +262,29 @@ export function AdminLeaveTypesPage() {
                 type="number"
                 min={1}
                 value={editForm.defaultQuotaDays}
-                onChange={(e) => setEditForm({ ...editForm, defaultQuotaDays: parseInt(e.target.value, 10) || 1 })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    defaultQuotaDays: parseInt(e.target.value, 10) || 1,
+                  })
+                }
                 required
               />
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 pt-1">
                 <input
                   type="checkbox"
                   id="editIsPaid"
                   checked={editForm.isPaid}
                   onChange={(e) => setEditForm({ ...editForm, isPaid: e.target.checked })}
-                  className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
+                  className="rounded text-primary focus:ring-primary w-4 h-4 cursor-pointer"
                 />
-                <label htmlFor="editIsPaid" className="text-sm font-medium text-gray-700">
+                <label htmlFor="editIsPaid" className="text-sm font-medium text-txt cursor-pointer">
                   จ่ายค่าจ้างตามปกติ (Paid Leave)
                 </label>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
-                <Button type="button" variant="secondary" onClick={() => setEditingType(null)}>
+              <div className="pt-3 border-t border-border flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setEditingType(null)}>
                   ยกเลิก
                 </Button>
                 <Button type="submit" variant="primary" isLoading={isUpdating}>
