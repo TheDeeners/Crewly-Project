@@ -26,13 +26,13 @@ export function Sidebar() {
 
   return (
     <aside className="w-56 min-h-screen bg-white border-r border-gray-200 p-4 flex flex-col gap-1">
-      <SidebarLink to="/dashboard" label="📊 แดชบอร์ด" />
-      <SidebarLink to="/attendance" label="📋 ประวัติการเข้างาน" />
-      <SidebarLink to="/my-leaves" label="🗓️ ใบลาของฉัน" />
+      <SidebarLink to="/dashboard" label="แดชบอร์ด" />
+      <SidebarLink to="/attendance" label="ประวัติการเข้างาน" />
+      <SidebarLink to="/my-leaves" label="ใบลาของฉัน" />
 
       {/* Manager and Admin can see approvals */}
       {(user.role === 'MANAGER' || user.role === 'ADMIN') && (
-        <SidebarLink to="/approvals" label="✅ อนุมัติใบลา" />
+        <SidebarLink to="/approvals" label="อนุมัติใบลา" />
       )}
 
       {/* Only Admin can see admin pages */}
@@ -41,9 +41,9 @@ export function Sidebar() {
           <div className="mt-4 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider px-4">
             Admin
           </div>
-          <SidebarLink to="/admin/users" label="👥 จัดการผู้ใช้" />
-          <SidebarLink to="/admin/leave-types" label="📝 ประเภทการลา" />
-          <SidebarLink to="/admin/holidays" label="🎉 วันหยุด" />
+          <SidebarLink to="/admin/users" label="จัดการผู้ใช้" />
+          <SidebarLink to="/admin/leave-types" label="ประเภทการลา" />
+          <SidebarLink to="/admin/holidays" label="วันหยุด" />
         </>
       )}
     </aside>

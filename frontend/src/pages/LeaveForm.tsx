@@ -72,7 +72,7 @@ export function LeaveFormPage() {
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">✍️ ยื่นใบลา</h1>
+          <h1 className="text-2xl font-bold text-gray-800">ยื่นใบลา</h1>
           <p className="text-sm text-gray-500 mt-1">กรอกรายละเอียดเพื่อขออนุมัติการลา</p>
         </div>
         <Button variant="secondary" onClick={() => navigate('/my-leaves')}>

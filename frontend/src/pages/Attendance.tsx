@@ -187,7 +187,7 @@ export function AttendancePage() {
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">📋 ประวัติการเข้างาน</h1>
+          <h1 className="text-2xl font-bold text-gray-800">ประวัติการเข้างาน</h1>
           <p className="text-sm text-gray-500 mt-1">ดูประวัติการเช็คอินและเช็คเอาต์ย้อนหลัง</p>
         </div>
 

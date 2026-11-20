@@ -83,7 +83,7 @@ export function DashboardPage() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
-            ยินดีต้อนรับ, {user?.firstName} {user?.lastName} 👋
+            ยินดีต้อนรับ, {user?.firstName} {user?.lastName}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             รหัสพนักงาน: <span className="font-semibold text-gray-700">{user?.employeeCode}</span> | บทบาท: <span className="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded font-semibold">{user?.role}</span>
@@ -107,7 +107,7 @@ export function DashboardPage() {
       {/* การ์ดบันทึกเวลาทำงาน (Attendance Card) */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-          ⏰ บันทึกเวลาเข้า-ออกงานวันนี้
+          บันทึกเวลาเข้า-ออกงานวันนี้
         </h2>
 
         {isLoading ? (
@@ -120,7 +120,7 @@ export function DashboardPage() {
                 <span className="text-gray-500">สถานะเช็คอิน:</span>
                 <span className="font-semibold text-gray-800">
                   {todayAttendance ? (
-                    <span className="text-green-600">✓ เช็คอินแล้ว ({formatTime(todayAttendance.checkInAt)})</span>
+                    <span className="text-green-600">เช็คอินแล้ว ({formatTime(todayAttendance.checkInAt)})</span>
                   ) : (
                     <span className="text-amber-600">ยังไม่เช็คอิน</span>
                   )}
@@ -130,7 +130,7 @@ export function DashboardPage() {
                 <span className="text-gray-500">สถานะเช็คเอาต์:</span>
                 <span className="font-semibold text-gray-800">
                   {todayAttendance?.checkOutAt ? (
-                    <span className="text-blue-600">✓ เช็คเอาต์แล้ว ({formatTime(todayAttendance.checkOutAt)})</span>
+                    <span className="text-blue-600">เช็คเอาต์แล้ว ({formatTime(todayAttendance.checkOutAt)})</span>
                   ) : (
                     <span className="text-gray-400">ยังไม่เช็คเอาต์</span>
                   )}
@@ -146,7 +146,7 @@ export function DashboardPage() {
                 disabled={Boolean(todayAttendance) || actionLoading}
                 className="w-full sm:w-auto py-3 px-6 text-base"
               >
-                {todayAttendance ? '✓ เช็คอินแล้ว' : '📍 เช็คอิน (Check-in)'}
+                {todayAttendance ? 'เช็คอินแล้ว' : 'เช็คอิน (Check-in)'}
               </Button>
 
               <Button
@@ -155,7 +155,7 @@ export function DashboardPage() {
                 disabled={!todayAttendance || Boolean(todayAttendance.checkOutAt) || actionLoading}
                 className="w-full sm:w-auto py-3 px-6 text-base bg-emerald-600 text-white hover:bg-emerald-700"
               >
-                {todayAttendance?.checkOutAt ? '✓ เช็คเอาต์แล้ว' : '🚪 เช็คเอาต์ (Check-out)'}
+                {todayAttendance?.checkOutAt ? 'เช็คเอาต์แล้ว' : 'เช็คเอาต์ (Check-out)'}
               </Button>
             </div>
           </div>
@@ -165,7 +165,7 @@ export function DashboardPage() {
       {/* สรุปโควตาการลา (Leave Quota Summary) */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-          🗓️ โควตาการลาคงเหลือประจำปี
+          โควตาการลาคงเหลือประจำปี
         </h2>
         {leaveBalances.length === 0 ? (
           <p className="text-sm text-gray-400">ยังไม่มีข้อมูลโควตาการลา</p>
