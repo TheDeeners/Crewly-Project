@@ -28,12 +28,20 @@ async function request<T>(
     headers,
   })
 
-  // Parse the JSON body regardless of success/failure
-  const data = await response.json()
+  // Parse response body safely
+  let data: any = null
+  try {
+    data = await response.json()
+  } catch {
+    // If not valid JSON (e.g. Vite proxy ECONNREFUSED 500 error)
+    if (!response.ok) {
+      throw new Error('ไม่สามารถเชื่อมต่อกับ Backend Server ได้ (กรุณาตรวจสอบว่าเซิร์ฟเวอร์ Backend กำลังทำงานอยู่ที่พอร์ต 3000 หรือไม่)')
+    }
+  }
 
   // If the response is not OK, throw an error with the server's message
   if (!response.ok) {
-    throw new Error(data.message || 'Something went wrong')
+    throw new Error(data?.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ')
   }
 
   return data as T
