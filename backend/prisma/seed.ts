@@ -4,68 +4,193 @@ import * as argon2 from 'argon2'
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🌱 Starting seed...')
+  console.log('Starting seed...')
 
   // --- Hash passwords for each role ---
-  const adminHash = await argon2.hash('Admin1234!')
-  const managerHash = await argon2.hash('Manager1234!')
-  const employeeHash = await argon2.hash('Employee1234!')
+  const adminHash = await argon2.hash('admin123')
+  const managerHash = await argon2.hash('manager123')
+  const employeeHash = await argon2.hash('employee123')
 
   // --- Create Admin user ---
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@crewly.test' },
+    where: { email: 'pimchanok@crewly.com' },
     update: {},
     create: {
-      employeeCode: 'EMP001',
-      email: 'admin@crewly.test',
+      employeeCode: 'admin-001',
+      email: 'pimchanok@crewly.com',
       passwordHash: adminHash,
-      firstName: 'Admin',
-      lastName: 'HR',
+      firstName: 'พิมพ์ชนก',
+      lastName: 'วงศ์สว่าง',
       role: Role.ADMIN,
     },
   })
 
-  // --- Create Manager user ---
-  const manager = await prisma.user.upsert({
-    where: { email: 'manager@crewly.test' },
+  const manager1 = await prisma.user.upsert({
+    where: { email: 'somchai@crewly.com' },
     update: {},
     create: {
-      employeeCode: 'EMP002',
-      email: 'manager@crewly.test',
+      employeeCode: 'emp-001',
+      email: 'somchai@crewly.com',
       passwordHash: managerHash,
-      firstName: 'John',
-      lastName: 'Manager',
+      firstName: 'สมชาย',
+      lastName: 'ศรีสุวรรณ',
       role: Role.MANAGER,
     },
   })
 
-  // --- Create Employee 1 (reports to manager) ---
-  const emp1 = await prisma.user.upsert({
-    where: { email: 'emp1@crewly.test' },
+  const manager2 = await prisma.user.upsert({
+    where: { email: 'waraporn@crewly.com' },
     update: {},
     create: {
-      employeeCode: 'EMP003',
-      email: 'emp1@crewly.test',
-      passwordHash: employeeHash,
-      firstName: 'Alice',
-      lastName: 'Smith',
-      role: Role.EMPLOYEE,
-      managerId: manager.id,
+      employeeCode: 'emp-002',
+      email: 'waraporn@crewly.com',
+      passwordHash: managerHash,
+      firstName: 'วราภรณ์',
+      lastName: 'จันทร์เพ็ญ',
+      role: Role.MANAGER,
     },
   })
 
-  // --- Create Employee 2 (reports to manager) ---
-  const emp2 = await prisma.user.upsert({
-    where: { email: 'emp2@crewly.test' },
+    const manager3 = await prisma.user.upsert({
+    where: { email: 'thanakorn@crewly.com' },
     update: {},
     create: {
-      employeeCode: 'EMP004',
-      email: 'emp2@crewly.test',
+      employeeCode: 'emp-003',
+      email: 'thanakorn@crewly.com',
+      passwordHash: managerHash,
+      firstName: 'ธนากร',
+      lastName: 'เกษมสุข',
+      role: Role.MANAGER,
+    },
+  })
+
+  const employee1 = await prisma.user.upsert({
+    where: { email: 'kamonchanok@crewly.com' },
+    update: {},
+    create: {
+      employeeCode: 'emp-004',
+      email: 'kamonchanok@crewly.com',
       passwordHash: employeeHash,
-      firstName: 'Bob',
-      lastName: 'Jones',
+      firstName: 'กมลชนก',
+      lastName: 'รัตนวงศ์',
       role: Role.EMPLOYEE,
-      managerId: manager.id,
+    },
+  })
+  
+    const employee2 = await prisma.user.upsert({
+    where: { email: 'piyaphong@crewly.com' },
+    update: {},
+    create: {
+      employeeCode: 'emp-005',
+      email: 'piyaphong@crewly.com',
+      passwordHash: employeeHash,
+      firstName: 'ปิยะพงษ์',
+      lastName: 'แก้วมณี',
+      role: Role.EMPLOYEE,
+    },
+  })
+  
+    const employee3 = await prisma.user.upsert({
+    where: { email: 'naphatsorn@crewly.com' },
+    update: {},
+    create: {
+      employeeCode: 'emp-006',
+      email: 'naphatsorn@crewly.com',
+      passwordHash: employeeHash,
+      firstName: 'นภัสสร',
+      lastName: 'ใจดี',
+      role: Role.EMPLOYEE,
+    },
+  })
+
+    const employee4 = await prisma.user.upsert({
+    where: { email: 'apichat@crewly.com' },
+    update: {},
+    create: {
+      employeeCode: 'emp-007',
+      email: 'apichat@crewly.com',
+      passwordHash: employeeHash,
+      firstName: 'อภิชาติ',
+      lastName: 'มั่นคง',
+      role: Role.EMPLOYEE,
+    },
+  })
+
+    const employee5 = await prisma.user.upsert({
+    where: { email: 'siriporn@crewly.com' },
+    update: {},
+    create: {
+      employeeCode: 'emp-008',
+      email: 'siriporn@crewly.com',
+      passwordHash: employeeHash,
+      firstName: 'ศิริพร',
+      lastName: 'บุญมา',
+      role: Role.EMPLOYEE,
+    },
+  })
+
+    const employee6 = await prisma.user.upsert({
+    where: { email: 'chayaphon@crewly.com' },
+    update: {},
+    create: {
+      employeeCode: 'emp-009',
+      email: 'chayaphon@crewly.com',
+      passwordHash: employeeHash,
+      firstName: 'ชยพล',
+      lastName: 'พงษ์ไพร',
+      role: Role.EMPLOYEE,
+    },
+  })
+
+    const employee7 = await prisma.user.upsert({
+    where: { email: 'nutthida@crewly.com' },
+    update: {},
+    create: {
+      employeeCode: 'emp-010',
+      email: 'nutthida@crewly.com',
+      passwordHash: employeeHash,
+      firstName: 'ณัฐธิดา',
+      lastName: 'สุขสันต์',
+      role: Role.EMPLOYEE,
+    },
+  })
+
+    const employee8 = await prisma.user.upsert({
+    where: { email: 'weerayut@crewly.com' },
+    update: {},
+    create: {
+      employeeCode: 'emp-011',
+      email: 'weerayut@crewly.com',
+      passwordHash: employeeHash,
+      firstName: 'วีรยุทธ',
+      lastName: 'ทองดี',
+      role: Role.EMPLOYEE,
+    },
+  })
+
+    const employee9 = await prisma.user.upsert({
+    where: { email: 'arunee@crewly.com' },
+    update: {},
+    create: {
+      employeeCode: 'emp-012',
+      email: 'arunee@crewly.com',
+      passwordHash: employeeHash,
+      firstName: 'อรุณี',
+      lastName: 'แสงทอง',
+      role: Role.EMPLOYEE,
+    },
+  })
+
+    const employee10 = await prisma.user.upsert({
+    where: { email: 'kittipat@crewly.com' },
+    update: {},
+    create: {
+      employeeCode: 'emp-013',
+      email: 'kittipat@crewly.com',
+      passwordHash: employeeHash,
+      firstName: 'กิตติพัฒน์',
+      lastName: 'เจริญผล',
+      role: Role.EMPLOYEE,
     },
   })
 
@@ -89,7 +214,7 @@ async function main() {
   })
 
   const leaveTypes = [sickLeave, vacationLeave, personalLeave]
-  const users = [admin, manager, emp1, emp2]
+  const users = [admin, manager1, manager2, manager3, employee1, employee2, employee3, employee4, employee5, employee6, employee7, employee8, employee9, employee10]
   const currentYear = new Date().getFullYear()
 
   // --- Create LeaveBalance for each user × each leave type ---
@@ -132,16 +257,16 @@ async function main() {
     })
   }
 
-  console.log('✅ Seed complete!')
-  console.log(`   Users: ${users.length}`)
-  console.log(`   Leave Types: ${leaveTypes.length}`)
+  console.log('Seed complete!')
+  console.log(`Users: ${users.length}`)
+  console.log(`Leave Types: ${leaveTypes.length}`)
   console.log(`   Holidays: ${holidays.length}`)
 }
 
 main()
   .catch((e) => {
     console.error(e)
-    process.exit(1)
+    throw e
   })
   .finally(async () => {
     await prisma.$disconnect()
