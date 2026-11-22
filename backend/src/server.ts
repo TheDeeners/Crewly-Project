@@ -6,6 +6,6 @@ import { createApp } from './app'
 const app = createApp()
 
 app.listen(env.PORT, () => {
-  console.log(`🚀 Crewly backend running on http://localhost:${env.PORT}`)
-  console.log(`   Environment: ${env.NODE_ENV}`)
+  console.log(`Crewly backend running on http://localhost:${env.PORT}`)
+  console.log(`Environment: ${env.NODE_ENV}`)
 })

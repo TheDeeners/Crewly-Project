@@ -21,8 +21,8 @@ export function Navbar({ onToggleSidebar }: NavbarProps) {
     : 'U'
 
   return (
-    <header className="h-16 shrink-0 z-30 bg-surface border-b border-border shadow-subtle flex items-center">
-      <div className="w-full px-4 sm:px-6 flex items-center justify-between">
+    <header className="h-16 shrink-0 z-30 bg-surface border-b border-border shadow-subtle">
+      <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Left: Mobile burger & Logo */}
         <div className="flex items-center gap-3">
           <button

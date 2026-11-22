@@ -100,7 +100,7 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
+    <div className="space-y-6">
       {/* ส่วนต้อนรับ (Hero Banner) */}
       <div className="relative overflow-hidden bg-gradient-to-r from-primary via-[#8C2341] to-secondary text-white rounded-3xl p-6 sm:p-8 shadow-card">
         {/* Soft decorative background circles */}
