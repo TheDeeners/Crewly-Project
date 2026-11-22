@@ -40,9 +40,11 @@ export function LoginPage() {
         <div className="bg-surface rounded-3xl border border-border shadow-float p-8 sm:p-10">
           {/* Logo & Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary text-white font-extrabold text-2xl items-center justify-center shadow-md mb-4">
-              C
-            </div>
+            <img
+              src="/logo.png"
+              alt="Crewly Logo"
+              className="w-16 h-16 rounded-2xl object-cover mx-auto shadow-md mb-3 border border-border/80"
+            />
             <h1 className="text-2xl font-bold text-primary tracking-tight">Crewly HRM</h1>
             <p className="text-txt-muted text-sm mt-1.5">
               ระบบบริหารจัดการบุคลากรและการเข้างาน

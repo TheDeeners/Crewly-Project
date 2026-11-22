@@ -34,9 +34,11 @@ export function Navbar({ onToggleSidebar }: NavbarProps) {
           </button>
 
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-base shadow-sm">
-              C
-            </div>
+            <img
+              src="/logo.png"
+              alt="Crewly Logo"
+              className="w-9 h-9 rounded-xl object-cover shadow-sm border border-border/60"
+            />
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-lg text-primary tracking-tight">Crewly</span>

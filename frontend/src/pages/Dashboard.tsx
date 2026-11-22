@@ -12,7 +12,6 @@ import {
   IconCalendar,
   IconPlus,
   IconArrowRight,
-  IconSun,
 } from '../components/Icons'
 
 export function DashboardPage() {
@@ -22,7 +21,6 @@ export function DashboardPage() {
   const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord | null>(null)
   const [leaveBalances, setLeaveBalances] = useState<LeaveBalance[]>([])
   const [allHolidays, setAllHolidays] = useState<Holiday[]>([])
-  const [upcomingHolidays, setUpcomingHolidays] = useState<Holiday[]>([])
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([])
   const [attendances, setAttendances] = useState<AttendanceRecord[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -80,15 +78,7 @@ export function DashboardPage() {
         setAttendances(attRecordsData.value || [])
       }
       if (holidayData.status === 'fulfilled') {
-        const hols = holidayData.value || []
-        setAllHolidays(hols)
-        // กรองเฉพาะวันหยุดที่กำลังจะมาถึงในอนาคต
-        const todayStr = new Date().toISOString().slice(0, 10)
-        const sorted = hols
-          .filter((h) => h.holidayDate >= todayStr)
-          .sort((a, b) => a.holidayDate.localeCompare(b.holidayDate))
-          .slice(0, 4) // เอา 4 วันหยุดที่ใกล้ที่สุด
-        setUpcomingHolidays(sorted)
+        setAllHolidays(holidayData.value || [])
       }
     } catch (err: any) {
       console.error(err)
@@ -233,134 +223,68 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* แถบสรุปภาพรวม (Overview Metric Cards — 3 Cards) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-        {/* Card 1: สถานะเวลาทำงานวันนี้ */}
-        <div className="bg-surface rounded-2xl border border-border p-4 shadow-card flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <span className="text-xs font-bold uppercase tracking-wider text-txt-muted">
-                การเข้างานวันนี้
-              </span>
-              {todayAttendance?.checkOutAt ? (
-                <Badge variant="info" size="sm">ออกงานแล้ว</Badge>
-              ) : todayAttendance ? (
-                <Badge variant="success" size="sm">กำลังปฏิบัติงาน</Badge>
-              ) : (
-                <Badge variant="pending" size="sm">ยังไม่เข้างาน</Badge>
-              )}
-            </div>
-
-            <div className="space-y-1.5 mt-2">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-txt-muted text-xs">เวลาเข้างาน:</span>
-                <span className="font-semibold text-txt">
-                  {todayAttendance?.checkInAt ? `${formatTime(todayAttendance.checkInAt)} น.` : '-'}
-                </span>
+      {/* Main Grid: แบ่ง 2 คอลัมน์ (Col 2 ซ้าย: การเข้างานวันนี้ + ปฏิทิน | Col 1 ขวา: สิทธิ์วันลาคงเหลือ) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+        {/* Left Section (2 Columns: กว้างเท่ากันระหว่าง การเข้างานวันนี้ และ ปฏิทิน) */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Card: การเข้างานวันนี้ (ขยายความกว้างเท่ากับปฏิทิน: col-span-2) */}
+          <div className="bg-surface rounded-2xl border border-border p-4 shadow-card">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 pb-3 border-b border-border/80">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-primary-light text-primary flex items-center justify-center">
+                  <IconClock className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-txt">การเข้างานวันนี้</h2>
+                  <p className="text-xs text-txt-muted">{todayDateThai}</p>
+                </div>
               </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-txt-muted text-xs">เวลาออกงาน:</span>
-                <span className="font-semibold text-txt">
-                  {todayAttendance?.checkOutAt ? `${formatTime(todayAttendance.checkOutAt)} น.` : '-'}
-                </span>
-              </div>
-            </div>
-          </div>
 
-          <div className="pt-2.5 mt-2.5 border-t border-border/70 flex justify-between items-center">
-            <span className="font-mono text-xs font-semibold text-primary">{currentTime}</span>
-            <button
-              onClick={() => {
-                setModalMessage(null)
-                setShowAttendanceModal(true)
-              }}
-              className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
-            >
-              <span>ลงเวลา</span>
-              <span>→</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Card 2: สิทธิ์วันลาคงเหลือรวม */}
-        <div className="bg-surface rounded-2xl border border-border p-4 shadow-card flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <span className="text-xs font-bold uppercase tracking-wider text-txt-muted">
-                สิทธิ์วันลาคงเหลือ
-              </span>
-              <Badge variant="success" size="sm">ปีปัจจุบัน</Badge>
-            </div>
-
-            <div className="mt-1 flex items-baseline justify-between">
               <div>
-                <span className="text-2xl font-extrabold text-primary">{totalRemaining}</span>
-                <span className="text-xs text-txt-muted ml-1.5 font-medium">/ {totalQuota} วัน</span>
+                {todayAttendance?.checkOutAt ? (
+                  <Badge variant="info">ออกงานแล้ว</Badge>
+                ) : todayAttendance ? (
+                  <Badge variant="success">กำลังปฏิบัติงาน</Badge>
+                ) : (
+                  <Badge variant="pending">ยังไม่เข้างาน</Badge>
+                )}
               </div>
-              <span className="text-xs text-txt-muted font-medium">ใช้ไปแล้ว {totalUsed} วัน</span>
             </div>
 
-            <div className="w-full bg-[#E8DDD9] h-1.5 rounded-full mt-2.5 overflow-hidden">
-              <div
-                className="bg-primary h-1.5 rounded-full transition-all duration-300"
-                style={{
-                  width: `${totalQuota > 0 ? Math.min(100, (totalUsed / totalQuota) * 100) : 0}%`,
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="pt-2.5 mt-2.5 border-t border-border/70 flex justify-between items-center">
-            <span className="text-xs text-txt-muted">{leaveBalances.length} ประเภทการลา</span>
-            <Link
-              to="/my-leaves"
-              className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
-            >
-              <span>ดูรายละเอียด</span>
-              <span>→</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* Card 3: ข้อมูลพนักงานและตำแหน่ง */}
-        <div className="bg-surface rounded-2xl border border-border p-4 shadow-card flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <span className="text-xs font-bold uppercase tracking-wider text-txt-muted">
-                ข้อมูลพนักงาน
-              </span>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary uppercase">
-                {user?.role}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2.5 mt-1">
-              <div className="w-9 h-9 rounded-xl bg-primary text-white font-bold text-sm flex items-center justify-center shrink-0">
-                {user?.firstName?.[0] || 'U'}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+              {/* Box 1: เวลาเข้างาน */}
+              <div className="p-3 rounded-xl bg-bg border border-border flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-0.5">เวลาเข้างาน (Check-in)</span>
+                  <span className="text-sm font-bold text-txt">
+                    {todayAttendance?.checkInAt ? `${formatTime(todayAttendance.checkInAt)} น.` : '-'}
+                  </span>
+                </div>
+                {todayAttendance ? (
+                  <span className="text-xs font-semibold text-status-success">✓ บันทึกแล้ว</span>
+                ) : (
+                  <span className="text-xs text-txt-muted">-</span>
+                )}
               </div>
-              <div className="min-w-0">
-                <p className="text-sm font-bold text-txt truncate">
-                  {user?.firstName} {user?.lastName}
-                </p>
-                <p className="text-xs text-txt-muted font-mono">{user?.employeeCode}</p>
+
+              {/* Box 2: เวลาออกงาน */}
+              <div className="p-3 rounded-xl bg-bg border border-border flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-0.5">เวลาออกงาน (Check-out)</span>
+                  <span className="text-sm font-bold text-txt">
+                    {todayAttendance?.checkOutAt ? `${formatTime(todayAttendance.checkOutAt)} น.` : '-'}
+                  </span>
+                </div>
+                {todayAttendance?.checkOutAt ? (
+                  <span className="text-xs font-semibold text-status-info">✓ บันทึกแล้ว</span>
+                ) : (
+                  <span className="text-xs text-txt-muted">-</span>
+                )}
               </div>
             </div>
           </div>
 
-          <div className="pt-2.5 mt-2.5 border-t border-border/70 flex justify-between items-center text-xs text-txt-muted">
-            <span className="truncate max-w-[170px]">{user?.email}</span>
-            <span className="text-status-success font-semibold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-status-success inline-block" />
-              ปกติ
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Grid: ปฏิทินการทำงานและวันหยุด (Col 2) & วันหยุดบริษัทเร็วๆ นี้ (Col 1) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* ตารางปฏิทินงานและวันหยุด (2 Columns) */}
-        <div className="lg:col-span-2">
+          {/* ปฏิทินตารางงานและวันหยุด (กว้างเท่ากับ การเข้างานวันนี้: col-span-2) */}
           <CalendarWidget
             holidays={allHolidays}
             leaveRequests={leaveRequests}
@@ -368,47 +292,90 @@ export function DashboardPage() {
           />
         </div>
 
-        {/* วันหยุดบริษัทเร็วๆ นี้ (Upcoming Holidays — 1 Column) */}
+        {/* Right Section: สิทธิ์วันลาคงเหลือ (ย้ายมาแทนที่ วันหยุดบริษัทเร็วๆ นี้: col-span-1) */}
         <div className="bg-surface rounded-2xl border border-border p-4 sm:p-5 shadow-card flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-border/80">
+          <div className="space-y-3.5">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-2.5 border-b border-border/80">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-primary-light text-primary flex items-center justify-center">
-                  <IconSun className="w-4 h-4" />
+                  <IconCalendar className="w-4 h-4" />
                 </div>
-                <h3 className="text-sm font-bold text-txt">วันหยุดบริษัทเร็วๆ นี้</h3>
+                <h3 className="text-sm font-bold text-txt">สิทธิ์วันลาคงเหลือ</h3>
+              </div>
+              <Badge variant="success" size="sm">ปี {new Date().getFullYear() + 543}</Badge>
+            </div>
+
+            {/* Total Balance Overview Box */}
+            <div className="p-3.5 rounded-xl bg-bg border border-border">
+              <div className="flex items-baseline justify-between mb-1">
+                <div>
+                  <span className="text-2xl font-extrabold text-primary">{totalRemaining}</span>
+                  <span className="text-xs text-txt-muted ml-1.5 font-medium">/ {totalQuota} วัน</span>
+                </div>
+                <span className="text-xs font-semibold text-txt-muted">
+                  ใช้ไปแล้ว {totalUsed} วัน
+                </span>
+              </div>
+              <div className="w-full bg-[#E8DDD9] h-1.5 rounded-full mt-2 overflow-hidden">
+                <div
+                  className="bg-primary h-1.5 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${totalQuota > 0 ? Math.min(100, (totalUsed / totalQuota) * 100) : 0}%`,
+                  }}
+                />
               </div>
             </div>
 
-            {upcomingHolidays.length === 0 ? (
-              <div className="py-6 text-center text-txt-muted text-xs bg-bg rounded-xl border border-border">
-                ไม่มีวันหยุดนักขัตฤกษ์เร็วๆ นี้
-              </div>
-            ) : (
-              <div className="space-y-2.5">
-                {upcomingHolidays.map((h) => (
-                  <div
-                    key={h.id}
-                    className="p-3 rounded-xl bg-bg border border-border flex items-center justify-between gap-2.5 hover:border-primary/20 transition-colors"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-txt truncate">{h.name}</p>
-                      <p className="text-[10px] text-txt-muted">วันหยุดตามประเพณี</p>
+            {/* Breakdown per Leave Type */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-txt-muted block">
+                โควตาแยกตามประเภท
+              </span>
+
+              {leaveBalances.length === 0 ? (
+                <p className="text-xs text-txt-muted py-2 text-center">ไม่มีข้อมูลโควตา</p>
+              ) : (
+                leaveBalances.map((b) => {
+                  const remaining = b.quotaDays - b.usedDays
+                  const pct = Math.min(100, Math.round((b.usedDays / b.quotaDays) * 100))
+                  return (
+                    <div
+                      key={b.id}
+                      className="p-2.5 rounded-xl bg-bg/60 border border-border/80 hover:border-primary/30 transition-colors"
+                    >
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="font-semibold text-txt truncate mr-2">{b.leaveType.name}</span>
+                        <span className="font-bold text-primary shrink-0">
+                          {remaining} <span className="text-[10px] text-txt-muted font-normal">/ {b.quotaDays} วัน</span>
+                        </span>
+                      </div>
+                      <div className="w-full bg-[#E8DDD9] h-1 rounded-full overflow-hidden">
+                        <div
+                          className="bg-primary h-1 rounded-full"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
                     </div>
-                    <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-lg bg-surface border border-border text-primary shrink-0">
-                      {h.holidayDate}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+                  )
+                })
+              )}
+            </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-border">
-            <p className="text-[11px] text-txt-muted flex items-center gap-1.5">
-              <span className="text-primary font-bold">ℹ</span>
-              <span>วันหยุดบริษัทจะไม่ถูกนับหักเป็นวันลา</span>
-            </p>
+          {/* Bottom Actions */}
+          <div className="mt-4 pt-3 border-t border-border flex flex-col gap-2">
+            <Link to="/leave-form" className="w-full">
+              <Button variant="primary" size="sm" className="w-full" leftIcon={<IconPlus className="w-3.5 h-3.5" />}>
+                ยื่นคำขอลาใหม่
+              </Button>
+            </Link>
+            <Link
+              to="/my-leaves"
+              className="text-xs text-center font-semibold text-primary hover:underline block pt-1"
+            >
+              ดูประวัติและรายละเอียดการลาทั้งหมด →
+            </Link>
           </div>
         </div>
       </div>
