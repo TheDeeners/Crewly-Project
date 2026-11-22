@@ -75,8 +75,10 @@ export default {
         float: '0 20px 25px -5px rgba(127, 29, 58, 0.08), 0 8px 10px -6px rgba(41, 35, 42, 0.04)',
       },
       borderRadius: {
-        '2xl': '1rem',
-        '3xl': '1.5rem',
+        'lg': '0.5rem',
+        'xl': '0.625rem',
+        '2xl': '0.75rem',
+        '3xl': '0.875rem',
       },
     },
   },

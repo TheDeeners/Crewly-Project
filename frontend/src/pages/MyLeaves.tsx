@@ -128,18 +128,18 @@ export function MyLeavesPage() {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-txt">ใบลาของฉัน</h1>
-          <p className="text-sm text-txt-muted mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-txt">ใบลาของฉัน</h1>
+          <p className="text-xs text-txt-muted mt-0.5">
             ตรวจสอบโควตาวันลาคงเหลือ และติดตามสถานะคำขอลา
           </p>
         </div>
 
         <Link to="/leave-form">
-          <Button variant="primary" leftIcon={<IconPlus className="w-4 h-4" />}>
+          <Button variant="primary" size="sm" leftIcon={<IconPlus className="w-3.5 h-3.5" />}>
             ยื่นคำขอลาใหม่
           </Button>
         </Link>
@@ -147,7 +147,7 @@ export function MyLeavesPage() {
 
       {message && (
         <div
-          className={`p-4 rounded-2xl text-sm font-medium border shadow-subtle ${
+          className={`p-3.5 rounded-xl text-xs font-medium border shadow-subtle ${
             message.type === 'success'
               ? 'bg-[#F0FDF4] text-[#15803D] border-[#BBF7D0]'
               : 'bg-[#FEF2F2] text-[#B91C1C] border-[#FECACA]'
@@ -158,7 +158,7 @@ export function MyLeavesPage() {
       )}
 
       {/* สรุปโควตาคงเหลือ */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
         {balances.map((b) => {
           const remaining = b.quotaDays - b.usedDays
           const usagePercent = Math.min(100, Math.round((b.usedDays / b.quotaDays) * 100))
@@ -166,7 +166,7 @@ export function MyLeavesPage() {
           return (
             <div
               key={b.id}
-              className="bg-surface p-5 rounded-2xl border border-border shadow-card hover:shadow-cardHover transition-all duration-150"
+              className="bg-surface p-4 rounded-xl border border-border shadow-card hover:shadow-cardHover transition-all duration-150"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-txt-muted">

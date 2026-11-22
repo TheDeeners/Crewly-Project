@@ -191,22 +191,22 @@ export function AttendancePage() {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header & Tabs */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-txt">ประวัติการเข้างาน</h1>
-          <p className="text-sm text-txt-muted mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-txt">ประวัติการเข้างาน</h1>
+          <p className="text-xs text-txt-muted mt-0.5">
             ตรวจสอบข้อมูลเวลาเข้า-ออกงานและการปฏิบัติงาน
           </p>
         </div>
 
         {/* แท็บสลับดูของตัวเอง หรือดูของทีม */}
         {isManagerOrAdmin && (
-          <div className="flex bg-surface p-1 rounded-2xl border border-border shadow-subtle">
+          <div className="flex bg-surface p-1 rounded-xl border border-border shadow-subtle">
             <button
               onClick={() => setActiveTab('me')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
                 activeTab === 'me'
                   ? 'bg-primary text-white shadow-sm'
                   : 'text-txt-muted hover:text-txt'
@@ -216,7 +216,7 @@ export function AttendancePage() {
             </button>
             <button
               onClick={() => setActiveTab('team')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
                 activeTab === 'team'
                   ? 'bg-primary text-white shadow-sm'
                   : 'text-txt-muted hover:text-txt'
@@ -229,7 +229,7 @@ export function AttendancePage() {
       </div>
 
       {error && (
-        <div className="p-4 bg-[#FEF2F2] text-[#B91C1C] rounded-2xl text-sm border border-[#FECACA]">
+        <div className="p-3.5 bg-[#FEF2F2] text-[#B91C1C] rounded-xl text-xs font-medium border border-[#FECACA]">
           {error}
         </div>
       )}
@@ -237,7 +237,7 @@ export function AttendancePage() {
       {/* Filter Card */}
       <form
         onSubmit={handleFilterSubmit}
-        className="bg-surface p-5 rounded-2xl border border-border shadow-card flex flex-wrap items-end gap-4"
+        className="bg-surface p-4 rounded-xl border border-border shadow-card flex flex-wrap items-end gap-3.5"
       >
         <div className="flex flex-col gap-1.5 flex-1 min-w-[160px]">
           <label className="text-xs font-semibold text-txt">ตั้งแต่วันที่</label>

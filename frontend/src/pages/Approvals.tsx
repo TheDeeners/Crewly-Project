@@ -147,16 +147,16 @@ export function ApprovalsPage() {
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-txt">พิจารณาอนุมัติใบลา</h1>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl sm:text-2xl font-bold text-txt">พิจารณาอนุมัติใบลา</h1>
             {pendingRequests.length > 0 && (
               <Badge variant="pending">{pendingRequests.length} รายการรอพิจารณา</Badge>
             )}
           </div>
-          <p className="text-sm text-txt-muted mt-0.5">
+          <p className="text-xs text-txt-muted mt-0.5">
             ตรวจสอบและพิจารณาอนุมัติหรือปฏิเสธคำขอลาของทีมงาน
           </p>
         </div>
@@ -164,7 +164,7 @@ export function ApprovalsPage() {
 
       {message && (
         <div
-          className={`p-4 rounded-2xl text-sm font-medium border shadow-subtle ${
+          className={`p-3.5 rounded-xl text-xs font-medium border shadow-subtle ${
             message.type === 'success'
               ? 'bg-[#F0FDF4] text-[#15803D] border-[#BBF7D0]'
               : 'bg-[#FEF2F2] text-[#B91C1C] border-[#FECACA]'
@@ -175,7 +175,7 @@ export function ApprovalsPage() {
       )}
 
       {isLoading ? (
-        <div className="bg-surface p-12 rounded-3xl border border-border text-center text-txt-muted text-sm shadow-subtle">
+        <div className="bg-surface p-8 rounded-xl border border-border text-center text-txt-muted text-sm shadow-subtle">
           กำลังโหลดรายการรออนุมัติ...
         </div>
       ) : (

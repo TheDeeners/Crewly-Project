@@ -72,11 +72,11 @@ export function LeaveFormPage() {
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-2xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-txt">ยื่นใบลา</h1>
-          <p className="text-sm text-txt-muted mt-0.5">กรอกรายละเอียดเพื่อขออนุมัติการลา</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-txt">ยื่นใบลา</h1>
+          <p className="text-xs text-txt-muted mt-0.5">กรอกรายละเอียดเพื่อขออนุมัติการลา</p>
         </div>
         <Button variant="outline" size="sm" onClick={() => navigate('/my-leaves')}>
           ย้อนกลับ
@@ -84,19 +84,19 @@ export function LeaveFormPage() {
       </div>
 
       {error && (
-        <div className="p-4 bg-[#FEF2F2] text-[#B91C1C] rounded-2xl text-sm border border-[#FECACA]">
+        <div className="p-3.5 bg-[#FEF2F2] text-[#B91C1C] rounded-xl text-xs font-medium border border-[#FECACA]">
           {error}
         </div>
       )}
 
       {isLoadingData ? (
-        <div className="bg-surface p-12 rounded-3xl border border-border text-center text-txt-muted text-sm shadow-subtle">
+        <div className="bg-surface p-8 rounded-xl border border-border text-center text-txt-muted text-sm shadow-subtle">
           กำลังโหลดข้อมูล...
         </div>
       ) : (
         <form
           onSubmit={handleSubmit}
-          className="bg-surface p-6 sm:p-8 rounded-3xl border border-border shadow-card space-y-5"
+          className="bg-surface p-5 sm:p-6 rounded-xl border border-border shadow-card space-y-4"
         >
           {/* เลือกประเภทการลา */}
           <div className="flex flex-col gap-1.5">

@@ -125,18 +125,19 @@ export function AdminLeaveTypesPage() {
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-txt">จัดการประเภทการลา</h1>
-          <p className="text-sm text-txt-muted mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-txt">จัดการประเภทการลา</h1>
+          <p className="text-xs text-txt-muted mt-0.5">
             กำหนดประเภทการลา โควตาวันลาเริ่มต้นต่อปี และเงื่อนไขค่าจ้าง
           </p>
         </div>
         <Button
           variant="primary"
+          size="sm"
           onClick={() => setShowCreateModal(true)}
-          leftIcon={<IconPlus className="w-4 h-4" />}
+          leftIcon={<IconPlus className="w-3.5 h-3.5" />}
         >
           เพิ่มประเภทการลา
         </Button>
@@ -144,7 +145,7 @@ export function AdminLeaveTypesPage() {
 
       {message && (
         <div
-          className={`p-4 rounded-2xl text-sm font-medium border shadow-subtle ${
+          className={`p-3.5 rounded-xl text-xs font-medium border shadow-subtle ${
             message.type === 'success'
               ? 'bg-[#F0FDF4] text-[#15803D] border-[#BBF7D0]'
               : 'bg-[#FEF2F2] text-[#B91C1C] border-[#FECACA]'
@@ -155,7 +156,7 @@ export function AdminLeaveTypesPage() {
       )}
 
       {isLoading ? (
-        <div className="bg-surface p-12 rounded-3xl border border-border text-center text-txt-muted text-sm shadow-subtle">
+        <div className="bg-surface p-8 rounded-xl border border-border text-center text-txt-muted text-sm shadow-subtle">
           กำลังโหลดประเภทการลา...
         </div>
       ) : (

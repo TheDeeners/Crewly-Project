@@ -11,9 +11,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Main App Canvas: Scrollable Area */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex gap-6 items-start">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex gap-4 items-start">
           {/* Desktop Floating Sidebar */}
-          <div className="hidden md:block w-64 shrink-0 sticky top-6">
+          <div className="hidden md:block w-60 shrink-0 sticky top-4">
             <Sidebar />
           </div>
 

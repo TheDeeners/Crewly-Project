@@ -69,8 +69,8 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
   if (!user) return null
 
   return (
-    <aside className="w-64 bg-surface rounded-3xl border border-border shadow-card p-4 sm:p-5 flex flex-col justify-between gap-6">
-      <div className="space-y-6">
+    <aside className="w-60 bg-surface rounded-2xl border border-border shadow-card p-3.5 sm:p-4 flex flex-col justify-between gap-4">
+      <div className="space-y-4">
         {/* Main Navigation Section */}
         <div>
           <p className="px-3 text-[11px] font-semibold text-txt-light uppercase tracking-wider mb-2">
